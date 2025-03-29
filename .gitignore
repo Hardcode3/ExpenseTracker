@@ -1,3 +1,10 @@
+# Ignore Alembic cache and temporary files
+alembic/__pycache__/
+alembic/versions/__pycache__/
+
+# If you generate database-specific artifacts in Alembic, ignore them
+alembic/versions/*.sqlite  # Example for SQLite (remove if not applicable)
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
