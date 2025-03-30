@@ -1,0 +1,55 @@
+name: Run Tests with Docker-Compose
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    env:
+      DB_HOST: "db"
+      DB_NAME: "expense_db"
+      DB_USER: "postgres"
+      DB_PASSWORD: "password"
+      DB_PORT: "5432"
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Docker Compose
+        run: docker-compose up -d
+
+      - name: Wait for services to be ready
+        run: |
+          echo "Waiting for database..."
+          while ! docker-compose exec -T db pg_isready -U $DB_USER -d $DB_NAME; do
+            sleep 2
+          done
+
+      - name: Run migrations
+        run: docker-compose run --rm app alembic upgrade head
+
+      - name: Run tests
+        run: docker-compose run --rm app pytest tests/end_to_end --cov=app --cov-report=term
+
+      - name: Copy coverage report from container
+        run: |
+          mkdir -p coverage_report
+          docker cp $(docker-compose ps -q app):/app/htmlcov ./coverage_report
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage_report/htmlcov
+          retention-days: 7
+
+      - name: Stop Docker Compose
+        run: docker-compose down
