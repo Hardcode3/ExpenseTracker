@@ -9,7 +9,7 @@ from sqlalchemy import pool
 from alembic import context
 
 # load_environment variables to avoid exposing the secrets
-load_dotenv()
+load_dotenv(verbose=True)
 
 # get the database URL from environment
 DB_HOST = os.getenv("DB_HOST")
