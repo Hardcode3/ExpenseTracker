@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where = ["app"]
+
+[project]
+name = "ExpenseTracker"
+version = "0.1.0"
+description = "Expense Tracker project. "
+authors = [{ name = "Baptiste Penot", email = "baptiste.penot.work@gmail.com" }]
+license = { text = "MIT" }
+readme = "README.md"
+requires-python = ">=3.13"
+
+[project.urls]
+homepage = "https://github.com/Hardcode3/ExpenseTracker"
+repository = "https://github.com/Hardcode3/ExpenseTracker"
