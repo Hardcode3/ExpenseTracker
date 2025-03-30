@@ -12,14 +12,20 @@ from alembic import context
 load_dotenv()
 
 # get the database URL from environment
-DATABASE_URL = os.getenv("DATABASE_URL")
+DB_HOST = os.getenv("DB_HOST")
+DB_NAME = os.getenv("DB_NAME")
+DB_USER = os.getenv("DB_USER")
+DB_PASSWORD = os.getenv("DB_PASSWORD")
+DB_PORT = os.getenv("DB_PORT")
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
 config = context.config
 
-if not DATABASE_URL:
-    raise EnvironmentError("Could not find DATABASE_URL environment variable")
+if not (DB_HOST or DB_NAME or DB_USER or DB_PASSWORD or DB_PORT):
+    raise EnvironmentError("Missing environment variable(s) DB_HOST / DB_NAME / DB_USER / DB_PASSWORD / DB_PORT")
+
+DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
 config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 # Interpret the config file for Python logging.
