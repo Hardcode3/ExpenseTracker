@@ -1,0 +1,4 @@
+pylint
+pytest
+httpx
+requests
