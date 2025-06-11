@@ -42,10 +42,12 @@ jobs:
           done
 
       - name: Run migrations
-        run: docker-compose run --rm fastapi_expense_backend alembic upgrade head
+        run: docker-compose exec -it fastapi_expense_backend alembic upgrade head
 
       - name: Run tests
-        run: docker-compose run --rm fastapi_expense_backend pytest tests/end_to_end --cov=app --cov-report=term
+        run: |
+          docker-compose exec -it fastapi_expense_backend pytest pip install -r requirements_tests.txt
+          docker-compose exec -it fastapi_expense_backend pytest tests/end_to_end --cov=app --cov-report=html
 
       - name: Copy coverage report from container
         run: |
