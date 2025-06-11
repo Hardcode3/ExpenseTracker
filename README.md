@@ -2,9 +2,24 @@
 
 Simple backend expense tracker (personal experiment)
 
+- [ExpenseTracker](#expensetracker)
+  - [Contributing](#contributing)
+    - [Configuring environment variables](#configuring-environment-variables)
+    - [Starting services](#starting-services)
+    - [Migrating changes made to the database](#migrating-changes-made-to-the-database)
+      - [Important notes about containers](#important-notes-about-containers)
+      - [Generate a migration script](#generate-a-migration-script)
+      - [Apply the migration script to the database](#apply-the-migration-script-to-the-database)
+      - [Rollback if needed](#rollback-if-needed)
+      - [Check the current version of the database schema](#check-the-current-version-of-the-database-schema)
+  - [Common Debug](#common-debug)
+    - [Check that your host machine has access to the api hosted in a container](#check-that-your-host-machine-has-access-to-the-api-hosted-in-a-container)
+    - [Check that your container has access to the the api hosted locally](#check-that-your-container-has-access-to-the-the-api-hosted-locally)
+    - [Check that alembic is up](#check-that-alembic-is-up)
+
 ## Contributing
 
-### Configure environment variables
+### Configuring environment variables
 
 In order to run properly and run safe, the code needs multiple environment variables.
 
@@ -12,10 +27,10 @@ A `.env` file must be created at the root of the project to load secrets to memo
 
 Here is an exhaustive list of variables that must be defined:
 
-- DB_HOST (db, docker-compose container name)
-- DB_PORT (often 5432 for postgres)
-- DB_USER
-- DB_PASSWORD
+- DB_HOST: db (docker-compose container name)
+- DB_PORT: 5432
+- DB_USER (ex. postgres)
+- DB_PASSWORD (ex. postgres)
 - DB_NAME: expense_db
 
 These environment variables are used:
@@ -23,40 +38,12 @@ These environment variables are used:
 - to define alembic `sqlalchemy.url` privately
 - to define sql engine in `app.core.database`: `engine = create_engine(DATABASE_URL)`
 
-> [!CAUTION]
-> Do not version your `.env` file.
+### Starting services
 
-## Common Debug
-
-### Check that your host machine has access to the api hosted in a container
-
-Outside Docker (on your host machine): The correct way to access the service is:
-
-- `http://localhost:8000`
-- `http://127.0.0.1:8000`
+To start database and api services, use:
 
 ```shell
-curl -v http://localhost:8000/docs
-```
-
-### Check that your container has access to the the api hosted locally
-
-Inside Docker: FastAPI binds to `0.0.0.0`, allowing access from anywhere inside the container.
-
-```shell
-docker exec -it fastapi_expense_backend sh
-```
-
-then in the opened container shell:
-
-```shell
-curl -v http://0.0.0.0:8000/docs
-```
-
-### Check that alembic is up
-
-```shell
-docker exec -it fastapi_expense_backend alembic current
+docker compose up -d
 ```
 
 ### Migrating changes made to the database
@@ -75,7 +62,6 @@ docker exec -it fastapi_expense_backend sh
 >
 > This error is due to the fact that db is the name of the docker-compose service and also the host name.
 > What would work is: "localhost" instead of "db", however the backend container would not be able to connect to the database url.
-
 
 #### Generate a migration script
 
@@ -143,4 +129,37 @@ alembic current
 INFO  [alembic.runtime.migration] Context impl PostgresqlImpl.
 INFO  [alembic.runtime.migration] Will assume transactional DDL.
 08290ef9350a (head)
+```
+
+## Common Debug
+
+### Check that your host machine has access to the api hosted in a container
+
+Outside Docker (on your host machine): The correct way to access the service is:
+
+- `http://localhost:8000`
+- `http://127.0.0.1:8000`
+
+```shell
+curl -v http://localhost:8000/docs
+```
+
+### Check that your container has access to the the api hosted locally
+
+Inside Docker: FastAPI binds to `0.0.0.0`, allowing access from anywhere inside the container.
+
+```shell
+docker exec -it fastapi_expense_backend sh
+```
+
+then in the opened container shell:
+
+```shell
+curl -v http://0.0.0.0:8000/docs
+```
+
+### Check that alembic is up
+
+```shell
+docker exec -it fastapi_expense_backend alembic current
 ```
